@@ -1,6 +1,6 @@
-# Picar-X
+# Hunter Brown's Picar-X
 
-Picar-X Python library for Raspberry Pi.
+Picar-X Python library for Raspberry Pi, as fucked up by Hunter Brown!
 
 Quick Links:
 
