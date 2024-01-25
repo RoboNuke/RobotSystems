@@ -183,6 +183,7 @@ class Picarx(object):
         self.config_flie.set("picarx_dir_servo", "%s"%value)
         self.dir_servo_pin.angle(value)
 
+    @log_on_start(logging.DEBUG, "Setting servo angle: {value}")
     def set_dir_servo_angle(self, value):
         self.dir_current_angle = constrain(value, self.DIR_MIN, self.DIR_MAX)
         angle_value  = self.dir_current_angle + self.dir_cali_val
