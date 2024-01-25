@@ -22,11 +22,14 @@ def backward(angle):
 def parallel(left):
     global px, power
 
+    off = -1 if left else 1
     px.backward(power)
-    for i in range(30,-30,-1):
+    px.set_dir_servo_angle(off * 30)
+    time.sleep(0.25)
+    for i in range(30*off,-30*off,-1*off):
         px.set_dir_servo_angle(i)
-        time.sleep(0.1)
-
+        time.sleep(0.02)
+    time.sleep(0.05)
     px.stop()
     
 
