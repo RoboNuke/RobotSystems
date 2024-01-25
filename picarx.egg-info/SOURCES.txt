@@ -4,6 +4,8 @@ README.md
 setup.py
 picarx/__init__.py
 picarx/picarx.py
+picarx/picarx_improved.py
+picarx/sim_robot_hat.py
 picarx/version.py
 picarx.egg-info/PKG-INFO
 picarx.egg-info/SOURCES.txt
