@@ -391,20 +391,20 @@ class ADC(I2C):
         # self.bus = smbus.DummySMBus(1)
         
     def read(self):                     # adc通道读取数---写一次数据，读取两次数据 （读取的数据范围是0~4095）
-        self._debug("Write 0x%02X to 0x%02X"%(self.chn, self.ADDR))
+        #self._debug("Write 0x%02X to 0x%02X"%(self.chn, self.ADDR))
         # self.bus.write_byte(self.ADDR, self.chn)      # 写入数据
         self.send([self.chn, 0, 0], self.ADDR)
 
-        self._debug("Read from 0x%02X"%(self.ADDR))
+        #self._debug("Read from 0x%02X"%(self.ADDR))
         # value_h = self.bus.read_byte(self.ADDR)
         value_h = self.recv(1, self.ADDR)[0]            # 读取数据
 
-        self._debug("Read from 0x%02X"%(self.ADDR))
+        #self._debug("Read from 0x%02X"%(self.ADDR))
         # value_l = self.bus.read_byte(self.ADDR)
         value_l = self.recv(1, self.ADDR)[0]            # 读取数据（读两次）
 
         value = (value_h << 8) + value_l
-        self._debug("Read value: %s"%value)
+        #self._debug("Read value: %s"%value)
         return value
 
     def read_voltage(self):                             # 将读取的数据转化为电压值（0~3.3V）

@@ -29,7 +29,10 @@ def parallel(left):
     for i in range(30*off,-30*off,-1*off):
         px.set_dir_servo_angle(i)
         time.sleep(0.02)
-    time.sleep(0.05)
+    if left:
+        time.sleep(0.1)
+    else:
+        time.sleep(0.05)
     px.stop()
     
 
