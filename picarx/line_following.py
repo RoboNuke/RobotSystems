@@ -17,7 +17,8 @@ except ModuleNotFoundError:
 from picarx_improved import Picarx
 import time
 from inputimeout import inputimeout
-
+import math
+logging.getLogger().setLevel(logging.DEBUG)
 
 class GrayscaleSensing:
     @log_on_end(DEBUG, "Grayscale Sensor Initialized")
@@ -44,12 +45,12 @@ class GrayscaleSensing:
         else:
             raise TypeError("reference parameter must be \'int\', \'float\', or 1*3 list.")
 
-    #@log_on_end(DEBUG, "Grayscale Data:{result}")
+    @log_on_end(INFO, "Grayscale Data:{result}")
     def getGrayscaleData(self):
         adcValues = []
-        adcValues.append(self.chnLeft.read())
-        adcValues.append(self.chnMid.read())
-        adcValues.append(self.chnRight.read())
+        adcValues.append(self.chnLeft.read() - self._reference[0])
+        adcValues.append(self.chnMid.read() - self._reference[1])
+        adcValues.append(self.chnRight.read() - self._reference[2])
         return adcValues
     
     @log_on_end(DEBUG, "Grayscale Sensor Read:{result}")
@@ -67,8 +68,16 @@ class Interpretation:
     def filter(self, rawReading):
         # returns 1 if can see line and 0 if can't for reach element of rawReading
         avg = sum(rawReading)/len(rawReading)
+        logging.log(DEBUG, f"Filter Avg: {math.fabs(avg)}")
+        maxDiff = max(rawReading) - min(rawReading)
+        if maxDiff < 10:
+            if math.fabs(avg) < 15.0:
+                return [0,0,0]
+            return [1,1,1]
         adj = [(x - avg) if self.pol else (avg - x) for x in rawReading]
+        logging.log(DEBUG, f"Filter Adjusted:{adj}")
         filtered = [1 if x > 0 else 0 for x in adj]
+
         return filtered
 
     @log_on_end(DEBUG, "Interpreted Line State: {result}")
@@ -111,7 +120,7 @@ class Controller:
     @log_on_start(DEBUG, "Recieved Line State:{lineState}")
     @log_on_end(DEBUG, "Calc Steering Angle: {result}")
     def getSteeringAngle(self, lineState):
-        return lineState * self.max * self.scale
+        return lineState**3 * self.max * self.scale
 
 
 def testSensorInterp():
@@ -132,22 +141,34 @@ def testLineState():
                 fil = [l, m, r]
                 print(f"{fil}:{interp.interpLineState(fil)}")
 
+def refLearner():
+    px = Picarx()
+    grayscale = GrayscaleSensing("A0", "A1", "A2")
+    px.set_dir_servo_angle(0.0)
+    px.forward(40)
+    avg = [0,0,0]
+    for i in range(100):
+        raw = grayscale.read()
+        for i in range(3):
+            avg[i] += raw[i]
+        time.sleep(0.05)
+    print(f"Average Reading: {avg[0]/100}, {avg[1]/100}, {avg[2]/100}")
 if __name__=="__main__":
     #testSensorInterp()
     #testLineState()
+    #refLearner()
+    ref = [31.28, 37.29, 36.66] 
+
     px = Picarx()
-    grayscale = GrayscaleSensing("A0", "A1", "A2")
-    interp = Interpretation(polarity=0)
+    grayscale = GrayscaleSensing("A0", "A1", "A2",ref)
+    interp = Interpretation(polarity=1)
     cont = Controller(1.0, 30)
 
     safe = True
     while safe:
-        #try:
-        #safe = not keyboard.is_pressed('q') and not keyboard.is_pressed('Space')
-        #except:
-        #    break
         try:
-            time_over = inputimeout(prompt="\b", timeout=0.025)
+            #time_over = inputimeout(prompt="\b", timeout=0.025)
+            true + "test"
             safe = False
             logging.log(DEBUG, "Safe set to False in Line Following")
             break
@@ -156,13 +177,11 @@ if __name__=="__main__":
         time.sleep(0.025)
         
         raw = grayscale.read()
-        raw[0] /=2
-        raw[1] /= 2
         ls = interp.calcLineState(raw)
         if ls == None:
             px.stop()
             continue
-        px.forward(50)
+        px.forward(35)
         angle = cont.getSteeringAngle(ls)
         px.set_dir_servo_angle(angle)
     logging.log(DEBUG, "Line Following Ended")
