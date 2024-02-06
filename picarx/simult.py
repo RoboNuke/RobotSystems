@@ -152,6 +152,7 @@ class ControllerConsumer:
             lineState = lineBus.read()
             if lineState != None:
                 ang =  lineState**3 * self.max * self.scale
+                logging.log(logging.DEBUG, f"Set angle to {ang}")
                 self.px.set_dir_servo_angle(ang)
                 logging.log(logging.DEBUG, f"Set angle to {ang}")
             else:
@@ -174,6 +175,7 @@ if __name__=="__main__":
     cont = ControllerConsumer(px, 1.0, 30)
 
     freq = 1.0
+    px.forward(35)
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         eSensor = executor.submit(grayscale.update, sensorBus, freq)
         eInterp = executor.submit(interp.update, sensorBus, lineStateBus, freq)
