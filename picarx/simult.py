@@ -150,6 +150,7 @@ class ControllerConsumer:
     def update(self, lineBus, freq):
         while self.safe:
             lineState = lineBus.read()
+            logging.log(logging.DEBUG, f"Controller got LS: {lineState}")
             if lineState != None:
                 ang =  lineState**3 * self.max * self.scale
                 logging.log(logging.DEBUG, f"Set angle to {ang}")
@@ -166,7 +167,7 @@ if __name__=="__main__":
     ref = [31.28, 37.29, 36.66] 
 
     sensorBus = SimpleBus([0.0, 0.0, 0.0])
-    lineStateBus = SimpleBus([0,0,0])
+    lineStateBus = SimpleBus(0.0)
 
 
     px = Picarx()
