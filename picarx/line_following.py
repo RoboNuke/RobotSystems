@@ -157,7 +157,13 @@ if __name__=="__main__":
     #testSensorInterp()
     #testLineState()
     #refLearner()
-    ref = [31.28, 37.29, 36.66] 
+    #grayscale = GrayscaleSensing("A0", "A1", "A2")
+    #px = Picarx()
+    #px.stop()
+    #while True:
+    #    print(grayscale.read())
+    #    time.sleep(1.0)
+    ref = [-992.82, -990.82, -990.72] 
 
     px = Picarx()
     grayscale = GrayscaleSensing("A0", "A1", "A2",ref)
